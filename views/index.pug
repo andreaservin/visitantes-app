@@ -1,0 +1,16 @@
+doctype
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        title
+    body
+    table
+        tr
+            th Id 
+            th Name 
+            th Visits
+        each visitor in visitors
+            tr
+                td= visitor._id
+                td= visitor.name
+                td= visitor.count
