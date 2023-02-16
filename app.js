@@ -33,37 +33,28 @@ app.use(express.urlencoded())
 
 // rutes
 app.get('/', async (request, response) => {
-  // find document
   const { name } = request.query
-  Visitor.find({ name: name })
-    .then((res) => {
-      if (res.length) {
-        // update document
-        const { count } = res[0]
-        Visitor.updateOne(res[0], { count: count + 1 })
-          .then(async () => {
-            console.log('Update successfully...')
-            // get all visitors
-            const visitors = await Visitor.find()
-            response.render('index', { visitors: visitors })
-          })
-          .catch((err) => console.log('ERROR when try to update: ', err))
-      } else {
-        // insert document
-        Visitor.create({ name: name || 'Anónimo' })
-          .then(async () => {
-            console.log('Visitante agregado.')
-            // get all visitors
-            const visitors = await Visitor.find()
-            response.render('index', { visitors: visitors })
-          })
-          .catch((err) => {
-            console.log('ERROR al registrar: ', err)
-          })
-      }
-    })
-    .catch((err) => console.log('ERROR when try to find: ', err))
+  let visitor = {}
+  if (name) {
+    // find document
+    visitor = await Visitor.findOne({ name: name })
+    if (visitor) {
+      // increment count
+      visitor.count += 1
+    } else {
+      // create document
+      visitor = new Visitor({ name: name })
+    }
+  } else {
+    // create document
+    visitor = new Visitor({ name: 'Anónimo' })
+  }
+  // save document
+  await visitor.save()
 
+  // get all visitors
+  const visitors = await Visitor.find()
+  response.render('index', { visitors: visitors })
 })
 
 app.listen(3000, () => console.log('Listening on port 3000!'))
