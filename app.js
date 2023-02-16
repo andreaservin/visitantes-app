@@ -32,7 +32,7 @@ app.set('views', 'views')
 app.use(express.urlencoded())
 
 // rutes
-app.get('/', (request, response) => {
+app.get('/', async (request, response) => {
   // find document
   const { name } = request.query
   Visitor.find({ name: name })
@@ -41,12 +41,22 @@ app.get('/', (request, response) => {
         // update document
         const { count } = res[0]
         Visitor.updateOne(res[0], { count: count + 1 })
-          .then(() => console.log('Update successfully...'))
+          .then(async () => {
+            console.log('Update successfully...')
+            // get all visitors
+            const visitors = await Visitor.find()
+            response.render('index', { visitors: visitors })
+          })
           .catch((err) => console.log('ERROR when try to update: ', err))
       } else {
         // insert document
         Visitor.create({ name: name || 'Anónimo' })
-          .then(() => console.log('Visitante agregado.'))
+          .then(async () => {
+            console.log('Visitante agregado.')
+            // get all visitors
+            const visitors = await Visitor.find()
+            response.render('index', { visitors: visitors })
+          })
           .catch((err) => {
             console.log('ERROR al registrar: ', err)
           })
@@ -54,12 +64,6 @@ app.get('/', (request, response) => {
     })
     .catch((err) => console.log('ERROR when try to find: ', err))
 
-  // get all visitors
-  Visitor.find()
-    .then((records) => {
-      response.render('index', { visitors: records })
-    })
-    .catch((err) => console.log('ERROR when try to get all records: ', err))
 })
 
 app.listen(3000, () => console.log('Listening on port 3000!'))
