@@ -5,10 +5,12 @@ html(lang='en')
         title
     body
     table
-        tr
-            th Id 
-            th Name 
-            th Visits
+        thead
+            tr
+                th Id 
+                th Name 
+                th Visits
+        tbody
         each visitor in visitors
             tr
                 td= visitor._id
